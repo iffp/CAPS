@@ -117,7 +117,8 @@ void FilterIndex::get_mc_propertiesIndex(){
     maxMCIDs.resize((treelen+1)*nc);
     maxMC = new uint16_t[3*(treelen+1)*nc]; 
     for (int clID = 0; clID < nc; clID++){
-        if (counts[clID+1]- counts[clID]==0) continue; // what  if the cluster size is less than 4. Do something then
+		// NOTE: This creates a segfault if the cluster is empty
+        // if (counts[clID+1]- counts[clID]==0) continue; // what  if the cluster size is less than 4. Do something then
         //get count of vector properties        
         //get the max
         for (int h=0; h<treelen; h++){ //iterate over tree height
