@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 
     // Read query vectors
 	size_t n_queries, d_;
-	float* query_vectors = fvecs_read(path_query_vectors.c_str(), &d, &n_queries);
+	float* query_vectors = fvecs_read(path_query_vectors.c_str(), &d_, &n_queries);
 	assert(d == d_);
 
     // Read query attributes
