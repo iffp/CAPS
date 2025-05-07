@@ -2,7 +2,7 @@
 #include <fstream>
 #include "FilterIndex.h"
 
-#include <thread>
+#include <unistd.h>
 #include "fanns_survey_helpers.cpp"
 
 int main(int argc, char** argv)
@@ -15,9 +15,6 @@ int main(int argc, char** argv)
     std::string path_database_vectors;
     std::string path_database_attributes;
     std::string path_index;
-    int M;
-    int MaxM0;
-    int efConstruction;
 	size_t n_clusters;
 	string metric;
     int mode;
@@ -25,8 +22,8 @@ int main(int argc, char** argv)
 
 
     // Parse arguments
-    if (argc != 11) {
-        fprintf(stderr, "Usage: %s <path_database_vectors> <path_database_attributes> <path_index> <M> <MaxM0> <efConstruction> <n_clusters> <metric> <mode> <algo>\n", argv[0]);
+    if (argc != 8) {
+        fprintf(stderr, "Usage: %s <path_database_vectors> <path_database_attributes> <path_index> <n_clusters> <metric> <mode> <algo>\n", argv[0]);
         exit(1);
     }
 
@@ -34,13 +31,10 @@ int main(int argc, char** argv)
     path_database_vectors = argv[1];
     path_database_attributes = argv[2];
     path_index = argv[3];
-    M = atoi(argv[4]);
-    MaxM0 = atoi(argv[5]);
-    efConstruction = atoi(argv[6]);
-	n_clusters = atoi(argv[7]);
-	metric = argv[8];
-	mode = atoi(argv[9]);
-	algo = argv[10];
+	n_clusters = atoi(argv[4]);
+	metric = argv[5];
+	mode = atoi(argv[6]);
+	algo = argv[7];
 
 	// Load database vectors
 	size_t d, n_items;

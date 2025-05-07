@@ -2,7 +2,7 @@
 #include <fstream>
 #include "FilterIndex.h"
 
-#include <threads>
+#include <unistd.h>
 #include "fanns_survey_helpers.cpp"
 
 
@@ -14,6 +14,8 @@ int main(int argc, char** argv)
     std::cout << "Number of threads: " << nthreads << std::endl;
 
     // Parameters
+    std::string path_database_vectors;
+    std::string path_database_attributes;
     std::string path_query_vectors;
     std::string path_query_attributes;
     std::string path_groundtruth;
@@ -26,27 +28,45 @@ int main(int argc, char** argv)
 	int k;
 
     // Check if the number of arguments is correct
-    if (argc != 11)
+    if (argc != 13)
     {
-        fprintf(stderr, "Usage: %s <path_query_vectors> <path_query_attributes> <path_groundtruth> <path_index> <metric> <mode> <algo> <n_clusters> <n_probe> <k>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <path_database_vectors> <path_database_attributes> <path_query_vectors> <path_query_attributes> <path_groundtruth> <path_index> <metric> <mode> <algo> <n_clusters> <n_probe> <k>\n", argv[0]);
         exit(1);
     }
 
     // Read command line arguments
-    path_query_vectors = argv[1];
-    path_query_attributes = argv[2];
-    path_groundtruth = argv[3];
-    path_index = argv[4];
-	metric = argv[5];
-	mode = atoi(argv[6]);
-	algo = argv[7];
-	n_clusters = atoi(argv[8]);
-	n_probe = atoi(argv[9]);
-	k = atoi(argv[10]);
+	path_database_vectors = argv[1];
+	path_database_attributes = argv[2];
+	path_query_vectors = argv[3];
+	path_query_attributes = argv[4];
+	path_groundtruth = argv[5];
+	path_index = argv[6];
+	metric = argv[7];
+	mode = atoi(argv[8]);
+	algo = argv[9];
+	n_clusters = atoi(argv[10]);
+	n_probe = atoi(argv[11]);
+	k = atoi(argv[12]);
+
+
+	// Read database vectors
+	size_t n_items, d;
+	float* database_vectors = fvecs_read(path_database_vectors.c_str(), &d, &n_items);
+
+	// Read database attributes
+	vector<int> database_attributes = read_one_int_per_line(path_database_attributes);
+	assert(database_attributes.size() == n_items);
+	
+	// Transform database attributes into format required by CAPS
+	std::vector<std::vector<std::string>> database_attributes_str;
+	for (std::size_t i = 0; i < database_attributes.size(); ++i) {
+		database_attributes_str.push_back({std::to_string(database_attributes[i])});
+	}
 
     // Read query vectors
-	size_t n_queries, d;
+	size_t n_queries, d_;
 	float* query_vectors = fvecs_read(path_query_vectors.c_str(), &d, &n_queries);
+	assert(d == d_);
 
     // Read query attributes
     vector<int> query_attributes = read_one_int_per_line(path_query_attributes);
@@ -58,7 +78,7 @@ int main(int argc, char** argv)
         query_attributes_str.push_back({std::to_string(query_attributes[i])});
     }
 
-    // Read groundtruth
+    // Read ground truth
     vector<vector<int>> groundtruth = read_ivecs(path_groundtruth);
     assert(groundtruth.size() == n_queries);
 
@@ -70,11 +90,9 @@ int main(int argc, char** argv)
     }
 
 	// Load the CAPS index
-	// TODO: We currently use empty database vectors since we load the pre-constructed index form file.
-	// If this turns out to not work, we need to change it.
-	float* empty_vectors = nullptr;
-	std::vector<std::vector<std::string>> empty_attributes;
-	FilterIndex caps_index(empty_vectors, d, 0, n_clusters, empty_attributes, algo, mode);
+	// NOTE: This requires loading the database vectors and attributes again. 
+	// Algorithmically, I don't think this would be necessary, but the code seems to require it.
+	FilterIndex caps_index(database_vectors, d, n_items, n_clusters, database_attributes_str, algo, mode);
 	caps_index.loadIndex(path_index);
 
 	// Execute the queries (timed)
