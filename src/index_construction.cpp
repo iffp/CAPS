@@ -1,8 +1,10 @@
 #include <iostream>
 #include <fstream>
+#include <thread>
 #include "FilterIndex.h"
 
 #include <atomic>
+#include <omp.h>
 #include "fanns_survey_helpers.cpp"
 #include "global_thread_counter.h"
 
@@ -12,6 +14,10 @@ std::atomic<int> peak_threads(1);
 
 int main(int argc, char** argv)
 {   
+    // Get number of WH threads and use that number of threads for the index construction
+    unsigned int nthreads = std::thread::hardware_concurrency();
+    omp_set_num_threads(nthreads);
+
     // Prepare thread monitoring
     std::atomic<bool> done(false);
     std::thread monitor(monitor_thread_count, std::ref(done));

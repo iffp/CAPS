@@ -11,6 +11,9 @@ std::atomic<int> peak_threads(1);
 
 int main(int argc, char** argv)
 {
+    // Restrict number of threads to 1 for query execution
+    omp_set_num_threads(1);
+
     // Monitor thread count
     std::atomic<bool> done(false);
     std::thread monitor(monitor_thread_count, std::ref(done));
