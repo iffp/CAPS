@@ -3,8 +3,10 @@
 #include "FilterIndex.h"
 
 #include <atomic>
+#include <omp.h>
 #include "fanns_survey_helpers.cpp"
 #include "global_thread_counter.h"
+
 
 // Global atomic to store peak thread count
 std::atomic<int> peak_threads(1);
