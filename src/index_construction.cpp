@@ -61,9 +61,9 @@ int main(int argc, char** argv)
     }
 
 	// Construct the index (timed)
-	// TODO: Should the 2nd line here also be timed? Does this construct the index or only store it to disk?
 	auto start_time = chrono::high_resolution_clock::now();
 	FilterIndex caps_index(database_vectors, d, n_items, n_clusters, database_attributes_str, algo, mode);
+	auto mid_time = chrono::high_resolution_clock::now();
 	caps_index.get_index(metric, path_index, mode);
 	auto end_time = chrono::high_resolution_clock::now();
 
@@ -72,11 +72,13 @@ int main(int argc, char** argv)
     monitor.join();
 
     // Print statistics
-    std::chrono::duration<double> diff = end_time - start_time;
-    double duration = diff.count();
+    std::chrono::duration<double> diff1 = end_time - start_time;
+    double duration1 = diff2.count();
+	std::chrono::duration<double> diff2 = mid_time - start_time;
+	double duration2 = diff1.count();
 	printf("Maximum number of threads: %d\n", peak_threads.load()-1);   // Subtract 1 because of the monitoring thread
-    printf("Index construction time: %.3f s\n", duration);
+    printf("Index construction time 1: %.3f s\n", duration1);
+    printf("Index construction time 2: %.3f s\n", duration2);
     peak_memory_footprint();
-
     return 0;
 }
