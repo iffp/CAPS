@@ -73,9 +73,9 @@ int main(int argc, char** argv)
 
     // Print statistics
     std::chrono::duration<double> diff1 = end_time - start_time;
-    double duration1 = diff2.count();
+    double duration1 = diff1.count();
 	std::chrono::duration<double> diff2 = mid_time - start_time;
-	double duration2 = diff1.count();
+	double duration2 = diff2.count();
 	printf("Maximum number of threads: %d\n", peak_threads.load()-1);   // Subtract 1 because of the monitoring thread
     printf("Index construction time 1: %.3f s\n", duration1);
     printf("Index construction time 2: %.3f s\n", duration2);
