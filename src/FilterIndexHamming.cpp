@@ -197,11 +197,11 @@ void FilterIndex::loadIndex(string indexpath){
             });
     }
     // reorder data and index
-    dataset_reordered = new float[nb*d];
+    dataset_reordered = new float[nb*(uint64_t)d];
     data_norms_reordered = new float[nb];
     properties_reordered = new uint8_t[nb*numAttr];
-    for(uint32_t i = 0; i < nb; ++i) {
-        copy(dataset+Lookup[i]*d, dataset+(Lookup[i]+1)*d , dataset_reordered+i*d);
+    for(uint64_t i = 0; i < nb; ++i) {
+        copy(dataset+Lookup[i]*(uint64_t)d, dataset+(Lookup[i]+1)*(uint64_t)d , dataset_reordered+i*(uint64_t)d);
         data_norms_reordered[i] = data_norms[Lookup[i]];
         memcpy(properties_reordered+ i*numAttr, properties[Lookup[i]].data(), sizeof(*properties_reordered) * numAttr);
     }
