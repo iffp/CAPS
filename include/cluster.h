@@ -100,17 +100,17 @@ class Kmeans: public cluster{
 
         void train(float* dataset, int nb, string modelpath){
             //centroids (nc * d) if centroids are set on input to train, they will be used as initialization
-            int v[nb];
+			int* v = new int[nb];
             randomShuffle(v , 0, nb);
             faiss::Clustering clus(d, nc);
             clus.centroids.resize(d*nc);
-            for(uint32_t i = 0; i < nc; ++i) { 
-                for(uint32_t j = 0; j < d; ++j){
-                    clus.centroids[i*d+j] = dataset[v[i]*d +j];
+            for(uint64_t i = 0; i < nc; ++i) { 
+                for(uint64_t j = 0; j < d; ++j){
+                    clus.centroids[i*(uint64_t)d+j] = dataset[v[i]*(uint64_t)d +j];
                 }
                 // memcpy(clus.centroids + i*d, dataset +v[i]*d, sizeof(*centroids) * d);
             }
-            clus.verbose = d * nb * nc > (1L << 30);
+            clus.verbose = (uint64_t)d * nb * nc > (1L << 30);
             // display logs if > 1Gflop per iteration
 
             faiss::IndexFlatL2 index(d);
@@ -120,9 +120,9 @@ class Kmeans: public cluster{
             cout<<"centroids size: "<<clus.centroids.size()<<endl; //centroids (nc * d) if centroids are set on input to train, they will be used as initialization
             
             // if L2 get norms as well
-            for(uint32_t j = 0; j < nc; ++j){ 
+            for(uint64_t j = 0; j < nc; ++j){ 
                 cen_norms[j]=0; 
-                for(uint32_t k = 0; k < d; ++k) {                 
+                for(uint64_t k = 0; k < d; ++k) {                 
                     cen_norms[j] += centroids[j*d +k]*centroids[j*d +k];        
                 } 
                 cen_norms[j] = cen_norms[j]/2;
@@ -135,6 +135,8 @@ class Kmeans: public cluster{
             FILE* f2 = fopen((modelpath+"/centroidsNorms.bin").c_str(), "wb");
             fwrite(cen_norms, sizeof(float), nc, f2);
             fclose (f2);
+
+			delete[] v;
         }
 
         uint32_t top(float* input){
